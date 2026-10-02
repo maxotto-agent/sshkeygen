@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SSH Ed25519 key generator – in your browser, nothing uploaded</title>
+<meta name="description" content="Generate an Ed25519 SSH key pair (OpenSSH format) entirely in your browser with WebCrypto. No server, no upload, no analytics. Open source, made by an AI agent.">
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:46rem;margin:2rem auto;padding:0 1rem}textarea,input{width:100%;font:13px monospace;box-sizing:border-box}textarea{height:11rem}button{font-size:1rem;padding:.4rem .9rem;margin:.3rem .3rem .3rem 0}.note{background:#fff8e1;border:1px solid #e6c200;padding:.6rem;border-radius:6px}footer{color:#555;font-size:.9rem;margin-top:2rem}</style></head><body>
+<h1>SSH Ed25519 key generator</h1>
+<p>Generates an OpenSSH-format Ed25519 key pair using your browser's WebCrypto. <b>Nothing leaves this page</b>: no server, no uploads, no analytics. You can save the page and run it offline.</p>
+<label>Comment (optional, e.g. you@laptop) <input id="c"></label>
+<p><button id="go">Generate key pair</button></p>
+<div id="out" hidden>
+<h2>Public key <button id="cp1">Copy</button><button id="dl1">Download id_ed25519.pub</button></h2><textarea id="pub" readonly style="height:4rem"></textarea>
+<p>Fingerprint: <code id="fp"></code></p>
+<h2>Private key <button id="cp2">Copy</button><button id="dl2">Download id_ed25519</button></h2><textarea id="priv" readonly></textarea>
+<p class="note">The private key is unencrypted. Save it to <code>~/.ssh/id_ed25519</code> and run <code>chmod 600 ~/.ssh/id_ed25519</code>. Add a passphrase afterwards with <code>ssh-keygen -p -f ~/.ssh/id_ed25519</code>. For high-value keys, prefer generating them with <code>ssh-keygen</code> on your own machine.</p>
+</div>
+<footer>Open source (MIT): <a href="https://github.com/maxotto-agent/sshkeygen">github.com/maxotto-agent/sshkeygen</a>. Built by Claude, an AI agent. Requires a browser with WebCrypto Ed25519 support (current Chrome, Firefox, Safari).</footer>
+<script>
+const enc=new TextEncoder();
+const cat=(...a)=>{const r=new Uint8Array(a.reduce((n,x)=>n+x.length,0));let o=0;for(const x of a){r.set(x,o);o+=x.length}return r};
+const u32=n=>new Uint8Array([n>>>24,n>>>16&255,n>>>8&255,n&255]);
+const str=b=>cat(u32(b.length),b);
+const b64=b=>btoa(String.fromCharCode(...b));
+function wrap(s,n){return s.match(new RegExp('.{1,'+n+'}','g')).join('\n')}
+async function gen(comment){
+  const kp=await crypto.subtle.generateKey({name:'Ed25519'},true,['sign','verify']);
+  const pub=new Uint8Array(await crypto.subtle.exportKey('raw',kp.publicKey));
+  const pk8=new Uint8Array(await crypto.subtle.exportKey('pkcs8',kp.privateKey));
+  const seed=pk8.slice(-32);
+  const blob=cat(str(enc.encode('ssh-ed25519')),str(pub));
+  const pubLine='ssh-ed25519 '+b64(blob)+(comment?' '+comment:'');
+  const chk=crypto.getRandomValues(new Uint8Array(4));
+  let priv=cat(chk,chk,str(enc.encode('ssh-ed25519')),str(pub),str(cat(seed,pub)),str(enc.encode(comment||'')));
+  const pad=(8-priv.length%8)%8;
+  priv=cat(priv,new Uint8Array(Array.from({length:pad},(_,i)=>i+1)));
+  const file=cat(enc.encode('openssh-key-v1\0'),str(enc.encode('none')),str(enc.encode('none')),str(new Uint8Array(0)),u32(1),str(blob),str(priv));
+  const pem='-----BEGIN OPENSSH PRIVATE KEY-----\n'+wrap(b64(file),70)+'\n-----END OPENSSH PRIVATE KEY-----\n';
+  const fp='SHA256:'+b64(new Uint8Array(await crypto.subtle.digest('SHA-256',blob))).replace(/=+$/,'');
+  return {pubLine,pem,fp};
+}
+const $=id=>document.getElementById(id);
+const save=(name,text)=>{const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([text],{type:'text/plain'}));a.download=name;a.click()};
+$('go').onclick=async()=>{try{const r=await gen($('c').value.trim());$('pub').value=r.pubLine;$('priv').value=r.pem;$('fp').textContent=r.fp;$('out').hidden=false}catch(e){alert('Generation failed (browser may lack Ed25519 WebCrypto): '+e.message)}};
+$('cp1').onclick=()=>navigator.clipboard.writeText($('pub').value);
+$('cp2').onclick=()=>navigator.clipboard.writeText($('priv').value);
+$('dl1').onclick=()=>save('id_ed25519.pub',$('pub').value+'\n');
+$('dl2').onclick=()=>save('id_ed25519',$('priv').value);
+</script></body></html>
