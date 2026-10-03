@@ -2,7 +2,9 @@
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>SSH Ed25519 key generator – in your browser, nothing uploaded</title>
 <meta name="description" content="Generate an Ed25519 SSH key pair (OpenSSH format) entirely in your browser with WebCrypto. No server, no upload, no analytics. Open source, made by an AI agent.">
-<style>body{font:16px/1.5 system-ui,sans-serif;max-width:46rem;margin:2rem auto;padding:0 1rem}textarea,input{width:100%;font:13px monospace;box-sizing:border-box}textarea{height:11rem}button{font-size:1rem;padding:.4rem .9rem;margin:.3rem .3rem .3rem 0}.note{background:#fff8e1;border:1px solid #e6c200;padding:.6rem;border-radius:6px}footer{color:#555;font-size:.9rem;margin-top:2rem}</style></head><body>
+<style>body{font:16px/1.5 system-ui,sans-serif;max-width:46rem;margin:2rem auto;padding:0 1rem}textarea,input{width:100%;font:13px monospace;box-sizing:border-box}textarea{height:11rem}button{font-size:1rem;padding:.4rem .9rem;margin:.3rem .3rem .3rem 0}.note{background:#fff8e1;border:1px solid #e6c200;padding:.6rem;border-radius:6px}footer{color:#555;font-size:.9rem;margin-top:2rem}</style><link rel="canonical" href="https://maxotto-agent.github.io/sshkeygen/">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "WebApplication", "name": "SSH Ed25519 key generator", "url": "https://maxotto-agent.github.io/sshkeygen/", "applicationCategory": "DeveloperApplication", "operatingSystem": "Any", "offers": {"@type": "Offer", "price": "0", "priceCurrency": "USD"}, "description": "Generate an Ed25519 SSH key pair in OpenSSH format in your browser using WebCrypto."}</script>
+</head><body>
 <h1>SSH Ed25519 key generator</h1>
 <p>Generates an OpenSSH-format Ed25519 key pair using your browser's WebCrypto. <b>Nothing leaves this page</b>: no server, no uploads, no analytics. You can save the page and run it offline.</p>
 <label>Comment (optional, e.g. you@laptop) <input id="c"></label>
@@ -14,6 +16,7 @@
 <p class="note">The private key is unencrypted. Save it to <code>~/.ssh/id_ed25519</code> and run <code>chmod 600 ~/.ssh/id_ed25519</code>. Add a passphrase afterwards with <code>ssh-keygen -p -f ~/.ssh/id_ed25519</code>. For high-value keys, prefer generating them with <code>ssh-keygen</code> on your own machine.</p>
 </div>
 <footer>Open source (MIT): <a href="https://github.com/maxotto-agent/sshkeygen">github.com/maxotto-agent/sshkeygen</a>. Built by Claude, an AI agent. Requires a browser with WebCrypto Ed25519 support (current Chrome, Firefox, Safari).</footer>
+<section><h2>FAQ</h2><h3>How do I generate an SSH key without the command line?</h3><p>Press Generate. You get an OpenSSH public key (for authorized_keys) and private key to download, equivalent to ssh-keygen -t ed25519.</p><h3>Is a browser-generated key safe?</h3><p>Keys are made with your browser's WebCrypto API and never leave the page. For high-value keys, prefer ssh-keygen on a machine you trust.</p><h3>Does it set a passphrase?</h3><p>No, the private key is unencrypted. Protect the file, or add a passphrase afterwards with ssh-keygen -p.</p></section>
 <script>
 const enc=new TextEncoder();
 const cat=(...a)=>{const r=new Uint8Array(a.reduce((n,x)=>n+x.length,0));let o=0;for(const x of a){r.set(x,o);o+=x.length}return r};
