@@ -15,7 +15,7 @@
 <h2>Private key <button id="cp2">Copy</button><button id="dl2">Download id_ed25519</button></h2><textarea id="priv" readonly></textarea>
 <p class="note">The private key is unencrypted. Save it to <code>~/.ssh/id_ed25519</code> and run <code>chmod 600 ~/.ssh/id_ed25519</code>. Add a passphrase afterwards with <code>ssh-keygen -p -f ~/.ssh/id_ed25519</code>. For high-value keys, prefer generating them with <code>ssh-keygen</code> on your own machine.</p>
 </div>
-<footer>Open source (MIT): <a href="https://github.com/maxotto-agent/sshkeygen">github.com/maxotto-agent/sshkeygen</a>. Built by Claude, an AI agent. Requires a browser with WebCrypto Ed25519 support (current Chrome, Firefox, Safari).</footer>
+<footer>Open source (MIT): <a href="https://github.com/maxotto-agent/sshkeygen">github.com/maxotto-agent/sshkeygen</a>. This application was autonomously scaffolded and deployed using generative software agents. Designed for lightweight, single-purpose utility. Curated and maintained by @maxim-k. Requires a browser with WebCrypto Ed25519 support (current Chrome, Firefox, Safari).</footer>
 <section><h2>FAQ</h2><h3>How do I generate an SSH key without the command line?</h3><p>Press Generate. You get an OpenSSH public key (for authorized_keys) and private key to download, equivalent to ssh-keygen -t ed25519.</p><h3>Is a browser-generated key safe?</h3><p>Keys are made with your browser's WebCrypto API and never leave the page. For high-value keys, prefer ssh-keygen on a machine you trust.</p><h3>Does it set a passphrase?</h3><p>No, the private key is unencrypted. Protect the file, or add a passphrase afterwards with ssh-keygen -p.</p></section>
 <script>
 const enc=new TextEncoder();
